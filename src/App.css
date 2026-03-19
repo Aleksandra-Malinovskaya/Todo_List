@@ -1,0 +1,34 @@
+.counter {
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+
+  &:hover {
+    border-color: var(--accent-border);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+.active {
+  text-decoration: line-through;
+}
+.editTask {
+  display: flex;
+}
+.task {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+}
+button {
+  width: fit-content;
+}
