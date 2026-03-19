@@ -44,7 +44,7 @@ function App() {
   });
 
   return (
-    <>
+    <div className="main">
       <h1>Мой To-Do List</h1>
       <InputTasks setTasks={setTasks} />
       <TasksList
@@ -62,7 +62,7 @@ function App() {
         <p>Осталось дел: {tasks.filter((item) => !item.isDone).length}</p>
         <button onClick={clearCompleted}>Очистить выполненные</button>
       </div>
-    </>
+    </div>
   );
 }
 

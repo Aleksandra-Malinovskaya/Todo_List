@@ -32,3 +32,6 @@
 button {
   width: fit-content;
 }
+.main {
+  margin: auto;
+}
