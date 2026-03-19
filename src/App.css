@@ -29,9 +29,25 @@
   justify-content: center;
   margin: 10px;
 }
+.task p {
+  margin: auto 1vh;
+}
 button {
   width: fit-content;
+  border: 1px, solid blue;
+  border-radius: 5px;
+  padding: 1vh;
+  margin: 1px 1vh;
+  background-color: rgb(167, 167, 249);
 }
 .main {
   margin: auto;
+}
+.inputTasks {
+  display: flex;
+  justify-content: center;
+  gap: 2vw;
+}
+.checkbox {
+  width: 2.5vh;
 }

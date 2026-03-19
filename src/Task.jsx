@@ -10,10 +10,14 @@ function Task({ item, isChecked, deleteTask, editTask }) {
     if (!isEdit) return;
     function handleClickOutside(event) {
       if (ref.current && !ref.current.contains(event.target)) {
-        cancelEdit();
+        handleEdit();
+        setNewTitle(item.title);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [isEdit]);
 
   function handleCheck() {
@@ -36,15 +40,15 @@ function Task({ item, isChecked, deleteTask, editTask }) {
       setNewTitle(item.title);
     }
   }
-  function cancelEdit() {
-    editTask(item.id, item.title);
-    setIsEdit(false);
-    setNewTitle(item.title);
-  }
 
   return (
     <div className="task" ref={ref}>
-      <input type="checkbox" checked={ischeck} onChange={handleCheck} />
+      <input
+        type="checkbox"
+        checked={ischeck}
+        onChange={handleCheck}
+        className="checkbox"
+      />
       {!isEdit ? (
         <p className={item.isDone ? "active" : ""}>{item.title}</p>
       ) : (

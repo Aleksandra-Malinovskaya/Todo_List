@@ -17,7 +17,7 @@ function InputTasks({ setTasks }) {
     }
   }
   return (
-    <div>
+    <div className="inputTasks">
       <input
         value={task}
         onChange={(e) => setTask(e.target.value)}
