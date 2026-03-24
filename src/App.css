@@ -42,6 +42,10 @@ button {
 }
 .main {
   margin: auto;
+  border: 3px, solid blue;
+  padding: 1vw;
+  border-radius: 5px;
+  background-color: rgb(193, 193, 244);
 }
 .inputTasks {
   display: flex;

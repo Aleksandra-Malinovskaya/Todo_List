@@ -2,44 +2,69 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { InputTasks } from "./InputTasks";
 import { TasksList } from "./TasksList";
+import api from "./api";
+import { useNavigate } from "react-router";
 
 function App() {
-  const [tasks, setTasks] = useState(() => {
-    const savedData = localStorage.getItem("tasks");
-    return savedData ? JSON.parse(savedData) : [];
-  });
+  const [tasks, setTasks] = useState([]);
   const [filtered, setFiltered] = useState("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth");
+    }
+    getAllTasks();
   }, [tasks]);
 
-  function isChecked(id) {
-    setTasks((tasks) =>
-      tasks.map((task) =>
-        task.id === id ? { ...task, isDone: !task.isDone } : task
-      )
-    );
-  }
-  function deleteTask(id) {
-    setTasks((tasks) => tasks.filter((item) => item.id !== id));
-  }
+  const getAllTasks = async () => {
+    try {
+      const response = await api.get("todos");
+      setTasks(response.data);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
 
-  function editTask(id, newTitle) {
-    setTasks((tasks) =>
-      tasks.map((item) =>
-        item.id === id ? { ...item, title: newTitle } : item
-      )
-    );
-  }
+  const isChecked = async (id) => {
+    try {
+      const response = await api.patch(`todos/${id}/isCompleted`);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+  const deleteTask = async (id) => {
+    try {
+      const response = await api.delete(`todos/${id}`);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
 
-  function clearCompleted() {
-    setTasks((tasks) => tasks.filter((item) => !item.isDone));
-  }
+  const editTask = async (id, newTitle) => {
+    try {
+      const response = await api.patch(`todos/${id}`, { title: newTitle });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const clearCompleted = async () => {
+    try {
+      const deleteCompleted = tasks.filter((item) => item.isCompleted);
+      const deletePromise = deleteCompleted.map((item) =>
+        api.delete(`todos/${item.id}`)
+      );
+      await Promise.all(deletePromise);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const filteredTasks = tasks.filter((item) => {
-    if (filtered === "active") return !item.isDone;
-    if (filtered === "completed") return item.isDone;
+    if (filtered === "active") return !item.isCompleted;
+    if (filtered === "completed") return item.isCompleted;
     return true;
   });
 
@@ -59,7 +84,7 @@ function App() {
         <button onClick={() => setFiltered("completed")}>Завершённые</button>
       </div>
       <div>
-        <p>Осталось дел: {tasks.filter((item) => !item.isDone).length}</p>
+        <p>Осталось дел: {tasks.filter((item) => !item.isCompleted).length}</p>
         <button onClick={clearCompleted}>Очистить выполненные</button>
       </div>
     </div>

@@ -1,21 +1,24 @@
 import { useState } from "react";
+import api from "./api";
 
 function InputTasks({ setTasks }) {
   const [task, setTask] = useState("");
   const [warning, setWarning] = useState(false);
 
-  function addTask() {
+  const addTask = async () => {
     if (task.trim() !== "") {
-      setTasks((tasks) => [
-        ...tasks,
-        { id: crypto.randomUUID(), title: task, isDone: false },
-      ]);
-      setTask("");
-      setWarning(false);
+      try {
+        const response = await api.post("todos", { title: task });
+        console.log(response.data);
+        setTask("");
+        setWarning(false);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
     } else {
       setWarning(true);
     }
-  }
+  };
   return (
     <div className="inputTasks">
       <input

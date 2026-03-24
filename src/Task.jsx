@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 function Task({ item, isChecked, deleteTask, editTask }) {
   const ref = useRef(null);
-  const [ischeck, setIsCheck] = useState(item.isDone);
+  const [ischeck, setIsCheck] = useState(item.isCompleted);
   const [isEdit, setIsEdit] = useState(false);
   const [newTitle, setNewTitle] = useState(item.title);
 
@@ -50,7 +50,7 @@ function Task({ item, isChecked, deleteTask, editTask }) {
         className="checkbox"
       />
       {!isEdit ? (
-        <p className={item.isDone ? "active" : ""}>{item.title}</p>
+        <p className={item.isCompleted ? "active" : ""}>{item.title}</p>
       ) : (
         <input
           value={newTitle}
