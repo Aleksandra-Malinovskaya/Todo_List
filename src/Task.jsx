@@ -61,11 +61,23 @@ function Task({ item, isChecked, deleteTask, editTask, loadingTask }) {
             ></input>
           )}
           {!isEdit ? (
-            <button onClick={() => setIsEdit((isEdit) => !isEdit)}>✍️</button>
+            <button
+              disabled={loadingTask === item.id}
+              onClick={() => setIsEdit((isEdit) => !isEdit)}
+            >
+              ✍️
+            </button>
           ) : (
-            <button onClick={handleEdit}>Сохранить</button>
+            <button disabled={loadingTask === item.id} onClick={handleEdit}>
+              Сохранить
+            </button>
           )}
-          <button onClick={() => deleteTask(item.id)}>❌</button>
+          <button
+            disabled={loadingTask === item.id}
+            onClick={() => deleteTask(item.id)}
+          >
+            ❌
+          </button>
         </>
       ) : (
         <p>Loading</p>
