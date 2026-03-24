@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "./api";
 function AuthForm() {
   const navigate = useNavigate();
@@ -10,6 +10,13 @@ function AuthForm() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  useEffect(()=>{
+    const token = localStorage.getItem('token');
+    if(token){
+      navigate('/todo')
+    }
+  },[])
   const onSubmit = async (data) => {
     try {
       console.log(data);
@@ -61,6 +68,8 @@ function AuthForm() {
       <p>{errors.password?.message}</p>
       {error && <p>{error}</p>}
       <button type="submit">Войти</button>
+      <br />
+      <button onClick={() => navigate("/")}>Пройти регистрацию</button>
     </form>
   );
 }

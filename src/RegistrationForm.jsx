@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import "./App.css";
 import api from "./api";
@@ -13,6 +13,12 @@ function RegistrationForm() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/todo");
+    }
+  }, []);
   const onSubmit = async (data) => {
     try {
       const response = await api.post("users/register", data);
@@ -111,6 +117,8 @@ function RegistrationForm() {
       <p>{errors.age?.message}</p>
 
       <button type="submit">Отправить</button>
+
+      <button onClick={() => navigate("/auth")}>Пройти авторизацию</button>
     </form>
   );
 }

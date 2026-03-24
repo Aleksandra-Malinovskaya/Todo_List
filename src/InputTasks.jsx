@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "./api";
 
-function InputTasks({ setTasks }) {
+function InputTasks({ getAllTasks }) {
   const [task, setTask] = useState("");
   const [warning, setWarning] = useState(false);
 
@@ -14,6 +14,8 @@ function InputTasks({ setTasks }) {
         setWarning(false);
       } catch (error) {
         console.log(error.response.data.message);
+      } finally {
+        getAllTasks();
       }
     } else {
       setWarning(true);

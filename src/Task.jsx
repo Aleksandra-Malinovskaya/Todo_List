@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-function Task({ item, isChecked, deleteTask, editTask }) {
+function Task({ item, isChecked, deleteTask, editTask, loadingTask }) {
   const ref = useRef(null);
   const [ischeck, setIsCheck] = useState(item.isCompleted);
   const [isEdit, setIsEdit] = useState(false);
@@ -43,27 +43,33 @@ function Task({ item, isChecked, deleteTask, editTask }) {
 
   return (
     <div className="task" ref={ref}>
-      <input
-        type="checkbox"
-        checked={ischeck}
-        onChange={handleCheck}
-        className="checkbox"
-      />
-      {!isEdit ? (
-        <p className={item.isCompleted ? "active" : ""}>{item.title}</p>
+      {!loadingTask ? (
+        <>
+          <input
+            type="checkbox"
+            checked={ischeck}
+            onChange={handleCheck}
+            className="checkbox"
+          />
+          {!isEdit ? (
+            <p className={item.isCompleted ? "active" : ""}>{item.title}</p>
+          ) : (
+            <input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => handleDownKey(e)}
+            ></input>
+          )}
+          {!isEdit ? (
+            <button onClick={() => setIsEdit((isEdit) => !isEdit)}>✍️</button>
+          ) : (
+            <button onClick={handleEdit}>Сохранить</button>
+          )}
+          <button onClick={() => deleteTask(item.id)}>❌</button>
+        </>
       ) : (
-        <input
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={(e) => handleDownKey(e)}
-        ></input>
+        <p>Loading</p>
       )}
-      {!isEdit ? (
-        <button onClick={() => setIsEdit((isEdit) => !isEdit)}>✍️</button>
-      ) : (
-        <button onClick={handleEdit}>Сохранить</button>
-      )}
-      <button onClick={() => deleteTask(item.id)}>❌</button>
     </div>
   );
 }

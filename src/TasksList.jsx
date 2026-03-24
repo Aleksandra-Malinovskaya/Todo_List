@@ -1,6 +1,6 @@
 import { Task } from "./Task";
 
-function TasksList({ tasks, isChecked, deleteTask, editTask }) {
+function TasksList({ tasks, isChecked, deleteTask, editTask, loadingTask }) {
   return (
     <>
       {tasks.map((item) => (
@@ -10,6 +10,7 @@ function TasksList({ tasks, isChecked, deleteTask, editTask }) {
           isChecked={isChecked}
           deleteTask={deleteTask}
           editTask={editTask}
+          loadingTask={loadingTask === item.id}
         />
       ))}
     </>
