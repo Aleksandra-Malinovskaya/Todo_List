@@ -1,16 +1,17 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { change, zero } from "./redux/inputAction";
+import { add } from "./redux/tasksAction";
 
-function InputTasks({ setTasks }) {
-  const [task, setTask] = useState("");
+function InputTasks() {
+  const { text } = useSelector((store) => store.text);
+  const dispatch = useDispatch();
   const [warning, setWarning] = useState(false);
 
   function addTask() {
-    if (task.trim() !== "") {
-      setTasks((tasks) => [
-        ...tasks,
-        { id: crypto.randomUUID(), title: task, isDone: false },
-      ]);
-      setTask("");
+    if (text.trim() !== "") {
+      dispatch(add(text));
+      dispatch(zero());
       setWarning(false);
     } else {
       setWarning(true);
@@ -19,8 +20,8 @@ function InputTasks({ setTasks }) {
   return (
     <div className="inputTasks">
       <input
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
+        value={text}
+        onChange={(e) => dispatch(change(e.target.value))}
         onKeyDown={(e) => (e.key === "Enter" ? addTask() : "")}
       />
       <button onClick={addTask}>Добавить</button>

@@ -2,40 +2,13 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { InputTasks } from "./InputTasks";
 import { TasksList } from "./TasksList";
+import { clearCompleted } from "./redux/tasksAction";
+import { useDispatch, useSelector } from "react-redux";
 
 function App() {
-  const [tasks, setTasks] = useState(() => {
-    const savedData = localStorage.getItem("tasks");
-    return savedData ? JSON.parse(savedData) : [];
-  });
+  const { tasks } = useSelector((store) => store.tasks);
+  const dispatch = useDispatch();
   const [filtered, setFiltered] = useState("all");
-
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  function isChecked(id) {
-    setTasks((tasks) =>
-      tasks.map((task) =>
-        task.id === id ? { ...task, isDone: !task.isDone } : task
-      )
-    );
-  }
-  function deleteTask(id) {
-    setTasks((tasks) => tasks.filter((item) => item.id !== id));
-  }
-
-  function editTask(id, newTitle) {
-    setTasks((tasks) =>
-      tasks.map((item) =>
-        item.id === id ? { ...item, title: newTitle } : item
-      )
-    );
-  }
-
-  function clearCompleted() {
-    setTasks((tasks) => tasks.filter((item) => !item.isDone));
-  }
 
   const filteredTasks = tasks.filter((item) => {
     if (filtered === "active") return !item.isDone;
@@ -46,13 +19,8 @@ function App() {
   return (
     <div className="main">
       <h1>Мой To-Do List</h1>
-      <InputTasks setTasks={setTasks} />
-      <TasksList
-        tasks={filteredTasks}
-        isChecked={isChecked}
-        deleteTask={deleteTask}
-        editTask={editTask}
-      />
+      <InputTasks />
+      <TasksList tasks={filteredTasks} />
       <div className="filtered">
         <button onClick={() => setFiltered("all")}>Все</button>
         <button onClick={() => setFiltered("active")}>Активные</button>
@@ -60,7 +28,9 @@ function App() {
       </div>
       <div>
         <p>Осталось дел: {tasks.filter((item) => !item.isDone).length}</p>
-        <button onClick={clearCompleted}>Очистить выполненные</button>
+        <button onClick={() => dispatch(clearCompleted())}>
+          Очистить выполненные
+        </button>
       </div>
     </div>
   );

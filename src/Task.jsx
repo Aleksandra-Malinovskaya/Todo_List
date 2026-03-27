@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { check, del, edit } from "./redux/tasksAction";
 
-function Task({ item, isChecked, deleteTask, editTask }) {
+function Task({ item }) {
   const ref = useRef(null);
   const [ischeck, setIsCheck] = useState(item.isDone);
   const [isEdit, setIsEdit] = useState(false);
   const [newTitle, setNewTitle] = useState(item.title);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isEdit) return;
@@ -22,12 +25,12 @@ function Task({ item, isChecked, deleteTask, editTask }) {
 
   function handleCheck() {
     setIsCheck((ischeck) => !ischeck);
-    isChecked(item.id);
+    dispatch(check(item.id));
   }
 
   function handleEdit() {
     if (newTitle.trim() !== "") {
-      editTask(item.id, newTitle);
+      dispatch(edit({ id: item.id, newTitle: newTitle }));
       setIsEdit((isEdit) => !isEdit);
     }
   }
@@ -35,7 +38,7 @@ function Task({ item, isChecked, deleteTask, editTask }) {
     if (e.key === "Enter") {
       handleEdit();
     } else if (e.key === "Escape") {
-      editTask(item.id, item.title);
+      dispatch(edit({ id: item.id, newTitle: newTitle }));
       setIsEdit(false);
       setNewTitle(item.title);
     }
@@ -63,7 +66,7 @@ function Task({ item, isChecked, deleteTask, editTask }) {
       ) : (
         <button onClick={handleEdit}>Сохранить</button>
       )}
-      <button onClick={() => deleteTask(item.id)}>❌</button>
+      <button onClick={() => dispatch(del(item.id))}>❌</button>
     </div>
   );
 }

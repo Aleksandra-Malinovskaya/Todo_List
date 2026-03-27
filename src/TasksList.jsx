@@ -1,16 +1,11 @@
+import { useSelector } from "react-redux";
 import { Task } from "./Task";
 
-function TasksList({ tasks, isChecked, deleteTask, editTask }) {
+function TasksList({ tasks }) {
   return (
     <>
       {tasks.map((item) => (
-        <Task
-          key={item.id}
-          item={item}
-          isChecked={isChecked}
-          deleteTask={deleteTask}
-          editTask={editTask}
-        />
+        <Task key={item.id} item={item} />
       ))}
     </>
   );
