@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { InputTasks } from "./InputTasks";
 import { TasksList } from "./TasksList";
-import { clearCompleted } from "./redux/tasksAction";
+import { clearCompl } from "./RTK/TasksSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
       </div>
       <div>
         <p>Осталось дел: {tasks.filter((item) => !item.isDone).length}</p>
-        <button onClick={() => dispatch(clearCompleted())}>
+        <button onClick={() => dispatch(clearCompl())}>
           Очистить выполненные
         </button>
       </div>

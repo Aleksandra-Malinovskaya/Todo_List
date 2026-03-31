@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { check, del, edit } from "./redux/tasksAction";
+import { check, del, edit } from "./RTK/TasksSlice";
 
 function Task({ item }) {
   const ref = useRef(null);

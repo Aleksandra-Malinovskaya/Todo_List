@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { change, zero } from "./redux/inputAction";
-import { add } from "./redux/tasksAction";
+import { change, zero } from "./RTK/InpitTextSlice";
+import { add } from "./RTK/TasksSlice";
 
 function InputTasks() {
-  const { text } = useSelector((store) => store.text);
+  const { value } = useSelector((store) => store.text);
   const dispatch = useDispatch();
   const [warning, setWarning] = useState(false);
 
   function addTask() {
-    if (text.trim() !== "") {
-      dispatch(add(text));
+    if (value.trim() !== "") {
+      dispatch(add(value));
       dispatch(zero());
       setWarning(false);
     } else {
@@ -20,7 +20,7 @@ function InputTasks() {
   return (
     <div className="inputTasks">
       <input
-        value={text}
+        value={value}
         onChange={(e) => dispatch(change(e.target.value))}
         onKeyDown={(e) => (e.key === "Enter" ? addTask() : "")}
       />
