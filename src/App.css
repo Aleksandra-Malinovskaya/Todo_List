@@ -42,6 +42,10 @@ button {
 }
 .main {
   margin: auto;
+  border: 3px, solid blue;
+  padding: 1vw;
+  border-radius: 5px;
+  background-color: rgb(193, 193, 244);
 }
 .inputTasks {
   display: flex;
@@ -50,4 +54,9 @@ button {
 }
 .checkbox {
   width: 2.5vh;
+}
+.exit {
+  background-color: rgb(236, 207, 207);
+  margin: 0 93.5%;
+  border: 3px, solid blue;
 }

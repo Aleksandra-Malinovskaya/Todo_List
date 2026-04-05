@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { check, del, edit } from "./RTK/TasksSlice";
+import { isChecked, deleteTask, editTask } from "./RTK/TasksSlice";
 
 function Task({ item }) {
   const ref = useRef(null);
-  const [ischeck, setIsCheck] = useState(item.isDone);
   const [isEdit, setIsEdit] = useState(false);
   const [newTitle, setNewTitle] = useState(item.title);
   const dispatch = useDispatch();
@@ -24,13 +23,12 @@ function Task({ item }) {
   }, [isEdit]);
 
   function handleCheck() {
-    setIsCheck((ischeck) => !ischeck);
-    dispatch(check(item.id));
+    dispatch(isChecked(item.id));
   }
 
   function handleEdit() {
     if (newTitle.trim() !== "") {
-      dispatch(edit({ id: item.id, newTitle: newTitle }));
+      dispatch(editTask({ id: item.id, newTitle: newTitle }));
       setIsEdit((isEdit) => !isEdit);
     }
   }
@@ -38,7 +36,7 @@ function Task({ item }) {
     if (e.key === "Enter") {
       handleEdit();
     } else if (e.key === "Escape") {
-      dispatch(edit({ id: item.id, newTitle: newTitle }));
+      dispatch(editTask({ id: item.id, newTitle: newTitle }));
       setIsEdit(false);
       setNewTitle(item.title);
     }
@@ -48,12 +46,12 @@ function Task({ item }) {
     <div className="task" ref={ref}>
       <input
         type="checkbox"
-        checked={ischeck}
+        checked={item.isCompleted}
         onChange={handleCheck}
         className="checkbox"
       />
       {!isEdit ? (
-        <p className={item.isDone ? "active" : ""}>{item.title}</p>
+        <p className={item.isCompleted ? "active" : ""}>{item.title}</p>
       ) : (
         <input
           value={newTitle}
@@ -66,7 +64,7 @@ function Task({ item }) {
       ) : (
         <button onClick={handleEdit}>Сохранить</button>
       )}
-      <button onClick={() => dispatch(del(item.id))}>❌</button>
+      <button onClick={() => dispatch(deleteTask(item.id))}>❌</button>
     </div>
   );
 }
