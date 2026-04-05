@@ -140,8 +140,9 @@ const TasksSlice = createSlice({
       )
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
-        (state) => {
+        (state, action) => {
           state.error = action.payload || action.error.message;
+          state.loading = false;
         }
       );
   },

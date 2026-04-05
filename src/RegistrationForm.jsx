@@ -26,7 +26,10 @@ function RegistrationForm() {
     if (token) {
       navigate("/todo");
     }
-  }, []);
+    if (isSuccess) {
+      navigate("/auth");
+    }
+  }, [isSuccess]);
   const onSubmit = (data) => {
     dispatch(regRequest(data));
   };
@@ -38,7 +41,6 @@ function RegistrationForm() {
       ) : (
         <>
           <h1>Регистрация</h1>
-          {isSuccess && <p>Успешно зарегистрирован</p>}
           {error && <p>{error}</p>}
           <div className="task">
             <p>Логин:</p>

@@ -17,8 +17,9 @@ function App() {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/auth");
+    } else {
+      dispatch(getTasks());
     }
-    dispatch(getTasks());
   }, []);
 
   const filteredTasks = tasks.filter((item) => {
