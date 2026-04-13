@@ -2,31 +2,42 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { InputTasks } from "./InputTasks";
 import { TasksList } from "./TasksList";
-import { useDispatch, useSelector } from "react-redux";
-import { selectValue, selectLoading } from "./RTK/TasksSlice";
 import { useNavigate } from "react-router";
-import { getTasks, clearCompleted } from "./RTK/TasksSlice";
+import { deleteTask, getTasks } from "./apiTasks";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 function App() {
-  const tasks = useSelector(selectValue);
-  const loading = useSelector(selectLoading);
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const [filtered, setFiltered] = useState("all");
   const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/auth");
-    } else {
-      dispatch(getTasks());
     }
   }, []);
-
-  const filteredTasks = tasks.filter((item) => {
-    if (filtered === "active") return !item.isCompleted;
-    if (filtered === "completed") return item.isCompleted;
-    return true;
+  const { data: tasks, isPending } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: getTasks,
   });
+  const clearCompleted = useMutation({
+    mutationFn: async () => {
+      const deleteCompleted = tasks.filter((item) => item.isCompleted);
+      const deletePromise = deleteCompleted.map((item) => deleteTask(item.id));
+      return await Promise.all(deletePromise);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  const filteredTasks = tasks
+    ? tasks.filter((item) => {
+        if (filtered === "active") return !item.isCompleted;
+        if (filtered === "completed") return item.isCompleted;
+        return true;
+      })
+    : [];
   const exitAccount = () => {
     localStorage.removeItem("token");
     navigate("/auth");
@@ -35,7 +46,7 @@ function App() {
   return (
     <>
       <div className="main">
-        {loading ? (
+        {isPending ? (
           <p>Loading...</p>
         ) : (
           <>
@@ -51,9 +62,10 @@ function App() {
             </div>
             <div>
               <p>
-                Осталось дел: {tasks.filter((item) => !item.isCompleted).length}
+                Осталось дел:{" "}
+                {tasks ? tasks.filter((item) => !item.isCompleted).length : 0}
               </p>
-              <button onClick={() => dispatch(clearCompleted())}>
+              <button onClick={() => clearCompleted.mutate()}>
                 Очистить выполненные
               </button>
             </div>

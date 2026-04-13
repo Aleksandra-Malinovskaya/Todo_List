@@ -1,19 +1,20 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  authRequest,
-  selectError,
-  selectLoading,
-  selectSuccess,
-} from "./RTK/AuthSlice";
+import { useMutation } from "@tanstack/react-query";
+import { authUser } from "./apiUser";
 function AuthForm() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const error = useSelector(selectError);
-  const isSuccess = useSelector(selectSuccess);
-  const loading = useSelector(selectLoading);
+  const auth = useMutation({
+    mutationFn: (data) => authUser(data),
+    onSuccess: (responseData) => {
+      const token = responseData.data.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        navigate("/todo");
+      }
+    },
+  });
   const {
     register,
     handleSubmit,
@@ -22,21 +23,21 @@ function AuthForm() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token || isSuccess) {
+    if (token) {
       navigate("/todo");
     }
-  }, [isSuccess]);
-  const onSubmit = async (data) => {
-    dispatch(authRequest(data));
+  }, []);
+  const onSubmit = (data) => {
+    auth.mutate(data);
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="main">
-      {loading ? (
+      {auth.isPending ? (
         <p>Loading...</p>
       ) : (
         <>
           <h1>Авторизация</h1>
-          {error && <p>{error}</p>}
+          {auth.error && <p>{auth.error.message}</p>}
           <div className="task">
             <p>Email:</p>
             <input

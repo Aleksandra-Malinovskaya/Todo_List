@@ -1,12 +1,30 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { isChecked, deleteTask, editTask } from "./RTK/TasksSlice";
+import { isChecked, deleteTask, editTask } from "./apiTasks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Task({ item }) {
+  const queryClient = useQueryClient();
+  const check = useMutation({
+    mutationFn: () => isChecked(item.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+  const deleteTasks = useMutation({
+    mutationFn: () => deleteTask(item.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+  const edit = useMutation({
+    mutationFn: () => editTask(item.id, newTitle),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
   const ref = useRef(null);
   const [isEdit, setIsEdit] = useState(false);
   const [newTitle, setNewTitle] = useState(item.title);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isEdit) return;
@@ -23,12 +41,12 @@ function Task({ item }) {
   }, [isEdit]);
 
   function handleCheck() {
-    dispatch(isChecked(item.id));
+    check.mutate(item.id);
   }
 
   function handleEdit() {
     if (newTitle.trim() !== "") {
-      dispatch(editTask({ id: item.id, newTitle: newTitle }));
+      edit.mutate(item.id, newTitle);
       setIsEdit((isEdit) => !isEdit);
     }
   }
@@ -36,36 +54,42 @@ function Task({ item }) {
     if (e.key === "Enter") {
       handleEdit();
     } else if (e.key === "Escape") {
-      dispatch(editTask({ id: item.id, newTitle: newTitle }));
+      edit.mutate(item.id, newTitle);
       setIsEdit(false);
       setNewTitle(item.title);
     }
   }
 
   return (
-    <div className="task" ref={ref}>
-      <input
-        type="checkbox"
-        checked={item.isCompleted}
-        onChange={handleCheck}
-        className="checkbox"
-      />
-      {!isEdit ? (
-        <p className={item.isCompleted ? "active" : ""}>{item.title}</p>
+    <>
+      {check.isPending || deleteTasks.isPending || edit.isPending ? (
+        <p>Loading...</p>
       ) : (
-        <input
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={(e) => handleDownKey(e)}
-        ></input>
+        <div className="task" ref={ref}>
+          <input
+            type="checkbox"
+            checked={item.isCompleted}
+            onChange={() => check.mutate(item.id)}
+            className="checkbox"
+          />
+          {!isEdit ? (
+            <p className={item.isCompleted ? "active" : ""}>{item.title}</p>
+          ) : (
+            <input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => handleDownKey(e)}
+            ></input>
+          )}
+          {!isEdit ? (
+            <button onClick={() => setIsEdit((isEdit) => !isEdit)}>✍️</button>
+          ) : (
+            <button onClick={handleEdit}>Сохранить</button>
+          )}
+          <button onClick={() => deleteTasks.mutate(item.id)}>❌</button>
+        </div>
       )}
-      {!isEdit ? (
-        <button onClick={() => setIsEdit((isEdit) => !isEdit)}>✍️</button>
-      ) : (
-        <button onClick={handleEdit}>Сохранить</button>
-      )}
-      <button onClick={() => dispatch(deleteTask(item.id))}>❌</button>
-    </div>
+    </>
   );
 }
 export { Task };

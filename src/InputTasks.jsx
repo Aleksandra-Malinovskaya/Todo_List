@@ -1,32 +1,38 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { change, zero } from "./RTK/InpitTextSlice";
-import { addTask } from "./RTK/TasksSlice";
+import { addTask } from "./apiTasks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function InputTasks() {
-  const { value } = useSelector((store) => store.text);
-  const dispatch = useDispatch();
-  const [warning, setWarning] = useState(false);
-
+  const queryClient = useQueryClient();
+  const [value, setValue] = useState("");
+  const add = useMutation({
+    mutationFn: (value) => addTask(value),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
   function addTasks() {
     if (value.trim() !== "") {
-      dispatch(addTask({ title: value }));
-      dispatch(zero());
-      setWarning(false);
-    } else {
-      setWarning(true);
+      add.mutate(value);
+      setValue("");
     }
   }
   return (
-    <div className="inputTasks">
-      <input
-        value={value}
-        onChange={(e) => dispatch(change(e.target.value))}
-        onKeyDown={(e) => (e.key === "Enter" ? addTasks() : "")}
-      />
-      <button onClick={addTask}>Добавить</button>
-      {warning && <p>Нельзя добавить пустую строку</p>}
-    </div>
+    <>
+      {add.isError ? <p>{add.error}</p> : ""}
+      {add.isPending ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="inputTasks">
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => (e.key === "Enter" ? addTasks() : "")}
+          />
+          <button onClick={addTasks}>Добавить</button>
+        </div>
+      )}
+    </>
   );
 }
 

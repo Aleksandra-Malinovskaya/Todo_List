@@ -2,20 +2,17 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import "./App.css";
 import { useNavigate } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  regRequest,
-  selectError,
-  selectLoading,
-  selectSuccess,
-} from "./RTK/AuthSlice";
+import { useMutation } from "@tanstack/react-query";
+import { regUser } from "./apiUser";
 
 function RegistrationForm() {
-  const dispatch = useDispatch();
-  const error = useSelector(selectError);
-  const isSuccess = useSelector(selectSuccess);
-  const loading = useSelector(selectLoading);
   const navigate = useNavigate();
+  const registration = useMutation({
+    mutationFn: (data) => regUser(data),
+    onSuccess: () => {
+      navigate("/auth");
+    },
+  });
   const {
     register,
     handleSubmit,
@@ -26,22 +23,20 @@ function RegistrationForm() {
     if (token) {
       navigate("/todo");
     }
-    if (isSuccess) {
-      navigate("/auth");
-    }
-  }, [isSuccess]);
+  }, [registration.isSuccess]);
   const onSubmit = (data) => {
-    dispatch(regRequest(data));
+    data.age = Number(data.age);
+    registration.mutate(data);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="main">
-      {loading ? (
+      {registration.isPending ? (
         <p>Loading...</p>
       ) : (
         <>
           <h1>Регистрация</h1>
-          {error && <p>{error}</p>}
+          {registration.error && <p>{registration.error.message}</p>}
           <div className="task">
             <p>Логин:</p>
             <input
